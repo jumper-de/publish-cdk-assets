@@ -1,0 +1,24 @@
+{
+  "name": "publish-cdk-assets",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "description": "Tool to publish AWS CDK assets to S3 from manifest.json",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "bin": {
+    "publish-cdk-assets": "./dist/bin/publish-cdk-assets.js"
+  },
+  "scripts": {
+    "lint": "tsc",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/credential-providers": "^3.81.0",
+    "@types/node": "^17.0.30",
+    "aws-cdk-lib": "^2.22.0",
+    "aws-sdk": "^2.1125.0",
+    "typescript": "^4.6.4",
+    "yargs": "^17.4.1",
+    "zip-a-folder": "^1.1.3"
+  }
+}

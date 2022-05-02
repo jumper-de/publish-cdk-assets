@@ -1,6 +1,6 @@
 {
   "name": "publish-cdk-assets",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "Apache-2.0",
   "description": "Tool to publish AWS CDK assets to S3 from manifest.json",
   "homepage": "https://github.com/p-mercury/publish-cdk-assets",

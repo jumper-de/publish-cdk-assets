@@ -11,10 +11,12 @@ _**Warning:** This package currently does not support Docker assets_
 ### Installation
 
 ```bash
-npm install publish-cdk-assets
+npm install -g publish-cdk-assets
 ```
 
 ### Basic Usage
+
+_**Important:** Assets in nested cloud assembly manifest ARE be included_
 
 The list function can be used for testing to show what CDK assets the CLI will be publish to S3 given the path to the manifest
 
@@ -28,4 +30,8 @@ The root command will publish the CDK assets listed in the manifest.json at the 
 pca ./path/to/manifest/
 ```
 
-_**Important:** Assets in nested cloud assembly manifest will be included_
+By default the current region is taken from the `AWS_REGION` environmental variable but can be changed using the `-r` option
+
+```bash
+pca ./path/to/manifest/ -r "eu-central-1"
+```

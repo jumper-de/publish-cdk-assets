@@ -1,24 +1,14 @@
 import path from "path";
-
 import {
   Manifest,
   AssemblyManifest,
   AssetManifest,
   AssetManifestProperties,
   NestedCloudAssemblyProperties,
-  FileSource,
-  FileDestination,
   ArtifactType,
 } from "aws-cdk-lib/cloud-assembly-schema";
 
-interface Source extends FileSource {
-  path?: string;
-}
-
-interface Asset {
-  source: Source;
-  destinations: { [id: string]: FileDestination };
-}
+import { Asset } from "./interfaces";
 
 export const getNestedAssets = (manifestPath: string) => {
   const assets = new Map<string, Asset>();

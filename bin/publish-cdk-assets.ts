@@ -4,41 +4,31 @@ const fs = require("fs");
 
 const { Manifest } = require("aws-cdk-lib/cloud-assembly-schema");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const {
-  STSClient,
-  AssumeRoleCommand,
-  getDefaultRoleAssumerWithWebIdentity,
-} = require("@aws-sdk/client-sts");
 const { fromTemporaryCredentials } = require("@aws-sdk/credential-providers");
 const { zip } = require("zip-a-folder");
+
+import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
 
 import { getNestedAssets } from "./../src/get-nested-assets";
 
 require("yargs")
   .command(
-    "* <manifest>",
-    "Upload CDK assets listed in the manifest",
+    "* <path>",
+    "Publish CDK assets listed in manifest.json at <path>",
     {
       r: {
         alias: ["region"],
         type: "string",
         default: process.env.AWS_REGION,
       },
-      a: {
-        alias: ["accountId"],
-        type: "string",
-        default: process.env.AWS_ACCOUNT_ID,
-      },
-      p: {
-        alias: ["partition"],
-        type: "string",
-        default: process.env.AWS_PARTITION,
-      },
     },
     async (argv: any) => {
-      const sts = new STSClient();
+      const assets = getNestedAssets(path.resolve(argv.path));
 
-      const assets = getNestedAssets(path.resolve(argv.manifest));
+      const client = new STSClient({});
+      const [, partition, , , accountId] = (
+        await client.send(new GetCallerIdentityCommand({}))
+      ).Arn!.split(":");
 
       for (var [assetKey, asset] of assets.entries()) {
         if (asset.source.packaging === "zip") {
@@ -51,27 +41,26 @@ require("yargs")
 
           const objectKey = destination.objectKey;
           const bucketName = destination.bucketName
-            .replaceAll("${AWS::Partition}", argv.partition)
+            .replaceAll("${AWS::Partition}", partition)
             .replaceAll("${AWS::Region}", argv.region)
-            .replaceAll("${AWS::AccountId}", argv.accountId);
+            .replaceAll("${AWS::AccountId}", accountId);
           const assumeRoleArn = destination
-            .assumeRoleArn!.replaceAll("${AWS::Partition}", argv.partition)
+            .assumeRoleArn!.replaceAll("${AWS::Partition}", partition)
             .replaceAll("${AWS::Region}", argv.region)
-            .replaceAll("${AWS::AccountId}", argv.accountId);
+            .replaceAll("${AWS::AccountId}", accountId);
 
           const fileStream = fs.createReadStream(asset.source.path);
 
+          const credentials = fromTemporaryCredentials({
+            params: {
+              RoleArn: assumeRoleArn,
+              RoleSessionName: `upload-cdk-asset-${assetKey}`.substring(0, 64),
+              DurationSeconds: 900,
+            },
+          });
+
           await new S3Client({
-            credentials: fromTemporaryCredentials({
-              params: {
-                RoleArn: assumeRoleArn,
-                RoleSessionName: `upload-cdk-asset-${assetKey}`.substring(
-                  0,
-                  64
-                ),
-                DurationSeconds: 900,
-              },
-            }),
+            credentials: credentials,
           }).send(
             new PutObjectCommand({
               Bucket: bucketName,
@@ -84,11 +73,11 @@ require("yargs")
     }
   )
   .command(
-    "ls <manifest>",
-    "List all discovered CDK assets",
+    "ls <path>",
+    "List all CDK assets found in manifest.json at <path>",
     {},
-    (argv: any) => {
-      const assets = getNestedAssets(path.resolve(argv.manifest));
+    async (argv: any) => {
+      const assets = getNestedAssets(path.resolve(argv.path));
 
       for (var [assetKey, asset] of assets.entries()) {
         console.log(asset.source.path);

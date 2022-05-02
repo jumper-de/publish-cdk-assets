@@ -1,18 +1,29 @@
 {
   "name": "publish-cdk-assets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "Apache-2.0",
   "description": "Tool to publish AWS CDK assets to S3 from manifest.json",
+  "homepage": "https://github.com/p-mercury/publish-cdk-assets",
+  "keywords": [
+    "aws",
+    "cdk",
+    "codepipeline"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/p-mercury/publish-cdk-assets.git"
+  },
+  "bugs": "https://github.com/p-mercury/publish-cdk-assets/issues",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "bin": {
-    "publish-cdk-assets": "./dist/bin/publish-cdk-assets.js"
+    "pca": "./dist/bin/publish-cdk-assets.js"
   },
   "scripts": {
-    "lint": "tsc",
-    "build": "tsc"
+    "prepack": "tsc -b"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.81.0",
     "@aws-sdk/credential-providers": "^3.81.0",
     "@types/node": "^17.0.30",
     "aws-cdk-lib": "^2.22.0",

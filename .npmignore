@@ -1,5 +1,0 @@
-# Output of 'npm pack'
-*.tgz
-
-# TypeScript cache
-*.tsbuildinfo

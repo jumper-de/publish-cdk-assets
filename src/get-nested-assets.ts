@@ -1,8 +1,6 @@
 import path from "path";
 import {
   Manifest,
-  AssemblyManifest,
-  AssetManifest,
   AssetManifestProperties,
   NestedCloudAssemblyProperties,
   ArtifactType,
@@ -10,11 +8,11 @@ import {
 
 import { Asset } from "./interfaces";
 
-export const getNestedAssets = (manifestPath: string) => {
+export function getNestedAssets(manifestPath: string) {
   const assets = new Map<string, Asset>();
 
   const { artifacts } = Manifest.loadAssemblyManifest(
-    path.join(manifestPath, "manifest.json")
+    path.join(manifestPath, "manifest.json"),
   );
 
   for (var artifactKey in artifacts) {
@@ -24,7 +22,7 @@ export const getNestedAssets = (manifestPath: string) => {
       const properties = artifact.properties as AssetManifestProperties;
 
       const { files } = Manifest.loadAssetManifest(
-        path.join(manifestPath, properties.file)
+        path.join(manifestPath, properties.file),
       );
 
       for (var fileKey in files) {
@@ -35,7 +33,9 @@ export const getNestedAssets = (manifestPath: string) => {
           source: {
             ...file.source,
             path: file.source.path
-              ? path.join(manifestPath, file.source.path)
+              ? path.isAbsolute(file.source.path)
+                ? file.source.path
+                : path.join(manifestPath, file.source.path)
               : undefined,
           },
         });
@@ -44,7 +44,9 @@ export const getNestedAssets = (manifestPath: string) => {
       const properties = artifact.properties as NestedCloudAssemblyProperties;
 
       getNestedAssets(
-        path.join(manifestPath, properties.directoryName)
+        path.isAbsolute(properties.directoryName)
+          ? properties.directoryName
+          : path.join(manifestPath, properties.directoryName),
       ).forEach((asset, assetKey) =>
         assets.set(assetKey, {
           ...assets.get(assetKey),
@@ -53,10 +55,10 @@ export const getNestedAssets = (manifestPath: string) => {
             ...(assets.get(assetKey) ? assets.get(assetKey)!.destinations : {}),
             ...asset.destinations,
           },
-        })
+        }),
       );
     }
   }
 
   return assets;
-};
+}

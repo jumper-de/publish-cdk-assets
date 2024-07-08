@@ -1,6 +1,6 @@
 {
   "name": "@flit/publish-cdk-assets",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A tool to publish CDK assets to S3 from manifest.json",
   "keywords": [
     "aws",
@@ -33,19 +33,19 @@
     "prepack": "rm -rf ./dist && tsc -b"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.583.0",
-    "@aws-sdk/client-sts": "^3.583.0",
-    "@aws-sdk/credential-providers": "^3.583.0",
-    "aws-cdk-lib": "^2.143.0",
+    "@aws-sdk/client-s3": "^3.609.0",
+    "@aws-sdk/client-sts": "^3.609.0",
+    "@aws-sdk/credential-providers": "^3.609.0",
+    "aws-cdk-lib": "^2.148.0",
     "yargs": "^17.7.2",
-    "zip-a-folder": "3.1.6"
+    "zip-a-folder": "3.1.7"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.2",
     "@types/archiver": "^6.0.2",
     "@types/is-glob": "^4.0.4",
-    "@types/node": "^20.12.12",
-    "typescript": "^5.4.5"
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
   },
   "publishConfig": {
     "access": "public"

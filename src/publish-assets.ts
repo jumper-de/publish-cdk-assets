@@ -19,7 +19,6 @@ export async function publishAsset(
   }
 
   console.log(`Publishing ${key}`);
-  console.log(asset.source.path);
 
   const promises: Promise<any>[] = [];
 
@@ -29,11 +28,11 @@ export async function publishAsset(
     const objectKey = destination.objectKey;
     const bucketName = destination.bucketName
       .replaceAll("${AWS::Partition}", partition)
-      .replaceAll("${AWS::Region}", region)
+      .replaceAll("${AWS::Region}", destination.region || region)
       .replaceAll("${AWS::AccountId}", account);
     const assumeRoleArn = destination
       .assumeRoleArn!.replaceAll("${AWS::Partition}", partition)
-      .replaceAll("${AWS::Region}", region)
+      .replaceAll("${AWS::Region}", destination.region || region)
       .replaceAll("${AWS::AccountId}", account);
 
     const fileStream = fs.createReadStream(asset.source.path!);
@@ -48,6 +47,7 @@ export async function publishAsset(
 
     promises.push(
       new S3Client({
+        region: destination.region || region,
         credentials: credentials,
       }).send(
         new PutObjectCommand({
